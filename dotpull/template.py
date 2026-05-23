@@ -32,7 +32,7 @@ def render_template(content: str, variables: Dict[str, str], strict: bool = True
         if key not in variables:
             if strict:
                 raise TemplateError(
-                    f"Undefined variable '{{key}}' in template. "
+                    f"Undefined variable '{key}' in template. "
                     f"Available variables: {sorted(variables.keys())}"
                 )
             return match.group(0)  # leave placeholder intact
@@ -66,3 +66,21 @@ def render_file(source: Path, variables: Dict[str, str], strict: bool = True) ->
 def collect_variables(template: str) -> list[str]:
     """Return a sorted list of unique variable names found in a template string."""
     return sorted(set(VARIABLE_PATTERN.findall(template)))
+
+
+def check_variables(template: str, variables: Dict[str, str]) -> list[str]:
+    """Return a sorted list of variable names referenced in the template but missing from variables.
+
+    Useful for validating a variables mapping before rendering, without raising an exception.
+
+    Args:
+        template: The template string to inspect.
+        variables: A mapping of variable names to their values.
+
+    Returns:
+        A sorted list of variable names that are present in the template but
+        not defined in *variables*. An empty list means the template is fully
+        satisfied by the provided variables.
+    """
+    referenced = set(VARIABLE_PATTERN.findall(template))
+    return sorted(referenced - variables.keys())
