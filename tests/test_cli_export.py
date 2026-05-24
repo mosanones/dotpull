@@ -60,6 +60,23 @@ def test_create_export_unknown_profile(runner, dotpull_env):
     assert "Unknown profile" in result.output
 
 
+def test_create_export_produces_valid_tarball(runner, dotpull_env):
+    """Ensure the created archive is a valid tar.gz containing the expected file."""
+    output_dir = dotpull_env["root"] / "out"
+    runner.invoke(
+        export_group,
+        ["create", "--config", dotpull_env["config"], "--output", str(output_dir)],
+    )
+    archives = list(output_dir.glob("*.tar.gz"))
+    assert archives, "no archive produced"
+
+    with tarfile.open(archives[0], "r:gz") as tar:
+        names = tar.getnames()
+    assert any("bashrc" in name for name in names), (
+        f"'bashrc' not found in archive members: {names}"
+    )
+
+
 def test_import_restores_files(runner, dotpull_env):
     output_dir = dotpull_env["root"] / "out"
     # first create
