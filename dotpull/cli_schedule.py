@@ -17,6 +17,17 @@ def _load(config_path: str):
     return cfg, store, store_path
 
 
+def _format_entry(name: str, entry) -> str:
+    """Format a single schedule entry for display.
+
+    Returns a human-readable string such as:
+        myprofile: every 3600s, last=1713000000, enabled
+    """
+    status = "enabled" if entry.enabled else "disabled"
+    last = f"{entry.last_run:.0f}" if entry.last_run else "never"
+    return f"{name}: every {entry.interval_seconds}s, last={last}, {status}"
+
+
 @click.group(name="schedule")
 def schedule_group():
     """Manage automatic sync schedules."""
@@ -62,9 +73,7 @@ def cmd_list(config: str):
         click.echo("No schedules defined.")
         return
     for name, entry in store.entries.items():
-        status = "enabled" if entry.enabled else "disabled"
-        last = f"{entry.last_run:.0f}" if entry.last_run else "never"
-        click.echo(f"{name}: every {entry.interval_seconds}s, last={last}, {status}")
+        click.echo(_format_entry(name, entry))
 
 
 @schedule_group.command("run-due")
