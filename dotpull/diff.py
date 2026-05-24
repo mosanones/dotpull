@@ -74,3 +74,19 @@ def diff_profile_files(
             target_path = home_dir / target_path
         results.append(diff_file(source, target_path))
     return results
+
+
+def summarize_diff_results(results: list[DiffResult]) -> dict[str, list[Path]]:
+    """Group diff results by status.
+
+    Args:
+        results: List of DiffResult objects to summarize.
+
+    Returns:
+        Dictionary mapping each status string to a list of target paths
+        with that status.
+    """
+    summary: dict[str, list[Path]] = {}
+    for result in results:
+        summary.setdefault(result.status, []).append(result.target)
+    return summary
