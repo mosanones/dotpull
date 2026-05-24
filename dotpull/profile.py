@@ -37,8 +37,26 @@ class Profile:
         return resolved
 
 
-def resolve_profile(name: str, config: dict[str, Any]) -> Profile:
-    """Resolve a profile by name, merging with any parent profiles."""
+def resolve_profile(name: str, config: dict[str, Any], _seen: set[str] | None = None) -> Profile:
+    """Resolve a profile by name, merging with any parent profiles.
+
+    Args:
+        name: The profile name to resolve.
+        config: The full dotpull configuration dictionary.
+        _seen: Internal set used to detect circular inheritance chains.
+
+    Raises:
+        ValueError: If the profile is not found or a circular extends chain is detected.
+    """
+    if _seen is None:
+        _seen = set()
+
+    if name in _seen:
+        chain = " -> ".join(sorted(_seen)) + f" -> {name}"
+        raise ValueError(f"Circular profile inheritance detected: {chain}")
+
+    _seen.add(name)
+
     dotfiles_dir = Path(config["dotfiles_dir"])
     profiles_data = config.get("profiles", {})
 
@@ -49,7 +67,7 @@ def resolve_profile(name: str, config: dict[str, Any]) -> Profile:
     profile = Profile(name, raw, dotfiles_dir)
 
     if profile.extends:
-        parent = resolve_profile(profile.extends, config)
+        parent = resolve_profile(profile.extends, config, _seen)
         merged_files = {**parent.files, **profile.files}
         merged_vars = {**parent.variables, **profile.variables}
         merged_data = {**raw, "files": merged_files, "variables": merged_vars}
