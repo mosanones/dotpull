@@ -1,4 +1,4 @@
-"""Main CLI entry point for dotpull."""
+"""Root CLI entry point for dotpull."""
 
 from __future__ import annotations
 
@@ -19,13 +19,17 @@ from dotpull.cli_resolve import resolve_group
 from dotpull.cli_status import status_group
 from dotpull.cli_init import init_group
 from dotpull.cli_migrate import migrate_group
+from dotpull.cli_lint import lint_group
 from dotpull.cli_tag import tag_group
+from dotpull.cli_search import search_group
+from dotpull.cli_compare import compare_group
+from dotpull.cli_history import history_group
 
 
 @click.group()
 @click.version_option()
 def cli():
-    """dotpull — sync and version your dotfiles across machines."""
+    """dotpull — Sync and version your dotfiles across machines."""
 
 
 cli.add_command(link_group)
@@ -43,4 +47,8 @@ cli.add_command(resolve_group)
 cli.add_command(status_group)
 cli.add_command(init_group)
 cli.add_command(migrate_group)
+cli.add_command(lint_group)
 cli.add_command(tag_group)
+cli.add_command(search_group)
+cli.add_command(compare_group)
+cli.add_command(history_group)
