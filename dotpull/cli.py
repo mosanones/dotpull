@@ -1,10 +1,12 @@
-"""Root CLI entry point for dotpull."""
-
+"""Root CLI entry-point for dotpull."""
 from __future__ import annotations
 
 import click
 
+from dotpull.cli_alias import alias_group
 from dotpull.cli_archive import archive_group
+from dotpull.cli_checksum import checksum_group
+from dotpull.cli_clean import clean_group
 from dotpull.cli_copy import copy_group
 from dotpull.cli_encrypt import encrypt_group
 from dotpull.cli_env import env_group
@@ -15,6 +17,7 @@ from dotpull.cli_init import init_group
 from dotpull.cli_lint import lint_group
 from dotpull.cli_link import link_group
 from dotpull.cli_migrate import migrate_group
+from dotpull.cli_patch import patch_group
 from dotpull.cli_pin import pin_group
 from dotpull.cli_remote import remote_group
 from dotpull.cli_resolve import resolve_group
@@ -27,16 +30,19 @@ from dotpull.cli_tag import tag_group
 from dotpull.cli_template import template_group
 from dotpull.cli_watch import watch_group
 from dotpull.cli_compare import compare_group
-from dotpull.cli_export import export_group
 
 
 @click.group()
-@click.version_option()
+@click.version_option(prog_name="dotpull")
 def cli():
     """dotpull — sync and version your dotfiles across machines."""
 
 
+cli.add_command(alias_group)
 cli.add_command(archive_group)
+cli.add_command(checksum_group)
+cli.add_command(clean_group)
+cli.add_command(compare_group)
 cli.add_command(copy_group)
 cli.add_command(encrypt_group)
 cli.add_command(env_group)
@@ -47,6 +53,7 @@ cli.add_command(init_group)
 cli.add_command(lint_group)
 cli.add_command(link_group)
 cli.add_command(migrate_group)
+cli.add_command(patch_group)
 cli.add_command(pin_group)
 cli.add_command(remote_group)
 cli.add_command(resolve_group)
@@ -58,4 +65,3 @@ cli.add_command(status_group)
 cli.add_command(tag_group)
 cli.add_command(template_group)
 cli.add_command(watch_group)
-cli.add_command(compare_group)
