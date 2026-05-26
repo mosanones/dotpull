@@ -14,6 +14,15 @@ def store_path(tmp_path: Path) -> Path:
     return tmp_path / ".dotpull" / "schedule.json"
 
 
+@pytest.fixture
+def populated_store() -> ScheduleStore:
+    """Return a ScheduleStore pre-populated with two enabled entries."""
+    store = ScheduleStore()
+    store.add("default", 300)
+    store.add("work", 60)
+    return store
+
+
 def test_load_returns_empty_when_no_file(store_path):
     store = ScheduleStore.load(store_path)
     assert store.entries == {}
@@ -100,3 +109,12 @@ def test_run_due_calls_on_sync_and_marks():
     assert set(called) == {"alpha", "beta"}
     assert store.entries["alpha"].last_run == now
     assert store.entries["beta"].last_run == now
+
+
+def test_run_due_returns_empty_when_nothing_due(populated_store):
+    """run_due should return an empty list when all entries were just run."""
+    now = time.time()
+    for profile in populated_store.entries:
+        populated_store.mark_run(profile, now=now)
+    ran = run_due(populated_store, on_sync=lambda p: None, now=now + 1)
+    assert ran == []
